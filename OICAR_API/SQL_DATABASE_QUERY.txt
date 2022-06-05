@@ -1,0 +1,108 @@
+create table County
+(
+ID int primary key identity(1,1),
+Title nvarchar(100) not null
+)
+
+create table City
+(
+ID int primary key identity(1,1),
+Title nvarchar(100) not null,
+CountyID int foreign key references County(ID) not null
+)
+
+create table Client
+(
+ID int primary key identity(1,1),
+Username nvarchar(100) not null,
+Passw nvarchar(100) not null,
+IsContractor bit not null,
+FirstName nvarchar(100) not null,
+LastName nvarchar(100) not null
+)
+
+create table ServiceCategory
+(
+ID int primary key identity(1,1),
+Title nvarchar(100) not null
+)
+
+create table ServiceSubcategory
+(
+ID int primary key identity(1,1),
+Title nvarchar(100) not null,
+ServiceCategoryID int foreign key references ServiceCategory(ID) not null
+)
+
+create table Offer 
+(
+ID int primary key identity(1,1),
+ClientID int foreign key references Client(ID) not null,
+ServiceSubcategoryID int foreign key references ServiceSubcategory(ID) not null,
+DatePublished datetime default GetDate(),
+CityID int foreign key references City(ID) not null,
+Caption nvarchar(max)
+)
+
+create table Review
+(
+ID int primary key identity(1,1),
+ClientID int foreign key references Client(ID) not null, 
+Caption nvarchar(max),
+Grade int check ( Grade > 0 AND Grade < 6) not null
+)
+
+create table ChatConversation
+(
+ID int primary key identity(1,1),
+ClientID_One int foreign key references Client(ID) not null,
+ClientID_Two int foreign key references Client(ID) not null,
+DateCreated datetime default GetDate()
+CONSTRAINT Chat UNIQUE(ClientID_One, ClientID_Two)
+)
+
+create table ChatReply
+(
+ID int primary key identity(1,1),
+Caption nvarchar(max),
+IsRead bit default 0,
+DateSent datetime default GetDate(),
+ChatID int foreign key references ChatConversation(ID) not null,
+SenderID int foreign key references Client(ID) not null
+)
+
+insert into Client(Username,Passw,FirstName,LastName,IsContractor) values ('user','pass','ime','prezime',1)
+insert into Client(Username,Passw,FirstName,LastName,IsContractor) values ('user2','pass','ime2','prezime2',0)
+insert into County(Title) values ('Zagrebacka')
+insert into City(Title,CountyID) values ('Zagreb',1)
+insert into City(Title,CountyID) values ('Sveti Ivan Zelina',1)
+insert into City(Title,CountyID) values ('Sveta Nedjelja',1)
+insert into City(Title,CountyID) values ('Velika Gorica',1)
+
+insert into County(Title) values ('Koprivnicko-krizevacka')
+insert into City(Title,CountyID) values ('Krizevci',2)
+insert into City(Title,CountyID) values ('Koprivnica',2)
+insert into City(Title,CountyID) values ('Durdevac',2)
+
+insert into ServiceCategory(Title) values ('Gradevina')
+insert into ServiceSubcategory(Title,ServiceCategoryID) values ('Krovista',1)
+insert into ServiceSubcategory(Title,ServiceCategoryID) values ('Stolarija',1)
+
+insert into ServiceCategory(Title) values ('Gradevina')
+insert into ServiceSubcategory(Title,ServiceCategoryID) values ('',1)
+
+insert into Offer(ClientID,ServiceSubcategoryID,CityID) values (1,1,1)
+insert into Offer(ClientID,ServiceSubcategoryID,CityID) values (1,1,1)
+
+insert into ChatConversation(ClientID_One,ClientID_Two) values (1,2)
+insert into ChatReply(Caption,ChatID,SenderID) values ('Pozz',1,2)
+insert into ChatReply(Caption,ChatID,SenderID) values ('Pozz',1,2)
+insert into ChatReply(Caption,ChatID,SenderID) values ('Pozzzzz',1,2)
+
+
+insert into Review(Caption,ClientID,Grade) values ('Odlicno',1,5)
+insert into Review(Caption,ClientID,Grade) values ('Super',1,4)
+insert into Review(Caption,ClientID,Grade) values ('Tak-tak',1,3)
+insert into Review(Caption,ClientID,Grade) values ('Odlicno',1,5)
+
+
